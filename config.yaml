@@ -1,0 +1,118 @@
+# 对练场 v1 配置 · 模型路由 + 2026-06-12 探活实测调整
+# 探活记录（tools/diag.py --cross 实测）：
+#   ✅ 活：gpt-5.4-2026-03-05(low) / gpt-5.5 / deepseek-v3.2 / deepseek-chat（均走 OPENAI 中转线）
+#        claude-sonnet-4-6 / claude-opus-4-6（CLAUDE 中转线）
+#   ❌ 挂：gemini 全系 503 · kimi 海外需代理 · 部分端点 key 待更新
+# 换模型 = 改 roles 一行；价格待 cost_ledger 真实账单校准
+
+app:
+  db_path: "data/sparring.db"
+
+roles:
+  contributors: [gpt55, deepseek_v32, claude_opus]   # 三家族真异构：GPT + DeepSeek(中文视角) + Claude
+  contributor_substitutes: [gpt54_low]
+  gate: gpt54_low          # 题型门卫（M2）
+  divergence: gpt54_low    # 分歧分析
+  coach: claude_sonnet     # 教练（产品生死线）
+  closure: gpt54_low       # 独立收口判定器（M2）
+  synthesis: gpt55         # 揭示综合（M2）
+  observe: claude_sonnet   # 画像观察（M4）
+
+fanout:
+  n_of_m: 2
+  per_model_timeout_seconds: 90
+  total_timeout_seconds: 120
+
+coach:
+  max_rounds: 8
+
+quota:
+  daily_sessions_per_user: 5
+
+models:
+  gpt55:
+    model_name: "gpt-5.5"
+    api_key_env: OPENAI_GPT52_API_KEY     # 一个 key 覆盖多个模型货架（已验证）
+    base_url_env: OPENAI_BASE_URL
+    timeout_seconds: 90
+    max_tokens: 4096
+    cost_per_1m_input: 5.00               # 官方口径 $5/$30 · 中转价待账单校准
+    cost_per_1m_output: 30.00
+
+  gpt54_low:
+    model_name: "gpt-5.4-2026-03-05"
+    reasoning_effort: "low"
+    api_key_env: OPENAI_GPT52_API_KEY
+    base_url_env: OPENAI_BASE_URL
+    timeout_seconds: 60
+    max_tokens: 4096
+    cost_per_1m_input: 5.00
+    cost_per_1m_output: 15.00
+
+  deepseek_v32:
+    model_name: "deepseek-v3.2"
+    api_key_env: OPENAI_GPT52_API_KEY     # 走中转线
+    base_url_env: OPENAI_BASE_URL
+    timeout_seconds: 90
+    max_tokens: 8192
+    cost_per_1m_input: 1.00               # 中转 deepseek ≈$0.001/K（估计值）
+    cost_per_1m_output: 1.00
+
+  claude_opus:
+    model_name: "claude-opus-4-6"
+    api_key_env: CLAUDE_SONNET_KEY        # 同 key 可调 opus（探活验证）
+    base_url_env: CLAUDE_BASE_URL
+    timeout_seconds: 90
+    max_tokens: 8192
+    cost_per_1m_input: 5.00               # 账单校准口径
+    cost_per_1m_output: 25.00
+
+  claude_sonnet:
+    model_name: "claude-sonnet-4-6"
+    api_key_env: CLAUDE_SONNET_KEY
+    base_url_env: CLAUDE_BASE_URL
+    timeout_seconds: 90
+    max_tokens: 8192
+    cost_per_1m_input: 3.00
+    cost_per_1m_output: 15.00
+
+  # ── 以下为暂不可用货架，恢复后可一行换回 roles ──
+
+  gpt54_high:
+    model_name: "gpt-5.4-2026-03-05"
+    reasoning_effort: "high"
+    api_key_env: OPENAI_GPT52_API_KEY     # 并到主工作 key
+    base_url_env: OPENAI_BASE_URL
+    timeout_seconds: 90
+    max_tokens: 4096
+    cost_per_1m_input: 5.00
+    cost_per_1m_output: 15.00
+
+  gemini_pro:
+    model_name: "gemini-3.1-pro-preview"  # 2026-06-12 中转 503
+    api_key_env: GEMINI_PRO_API_KEY
+    base_url_env: GEMINI_PRO_BASE_URL
+    timeout_seconds: 90
+    max_tokens: 8192
+    cost_per_1m_input: 2.00
+    cost_per_1m_output: 12.00
+
+  gemini_flash_lite:
+    model_name: "gemini-3.1-flash-lite-preview"  # 2026-06-12 中转 503
+    api_key_env: GEMINI_FLASH_API_KEY
+    base_url_env: GEMINI_FLASH_BASE_URL
+    timeout_seconds: 30
+    max_tokens: 4096
+    cost_per_1m_input: 0.10
+    cost_per_1m_output: 0.40
+
+  kimi:
+    model_name: "kimi-k2.5"               # 海外 IP 需 CHINA_PROXY（当前未设）
+    api_key_env: KIMI_OFFICIAL_API_KEY_1
+    base_url_env: KIMI_BASE_URL
+    proxy_env: CHINA_PROXY
+    temperature: 1.0
+    timeout_seconds: 90
+    max_tokens: 8192
+    cost_per_1m_input: 0.60
+    cost_per_1m_output: 2.40

@@ -1,0 +1,15 @@
+.env
+data/
+.venv/
+__pycache__/
+*.py[cod]
+*.db
+*.db-wal
+*.db-shm
+.pytest_cache/
+dist/
+*.egg-info/
+
+# 前端依赖与构建缓存
+node_modules/
+*.tsbuildinfo
