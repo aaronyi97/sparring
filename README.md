@@ -1,4 +1,4 @@
-> Status: experimental module. This repo is one mechanism inside my broader AI Workflow Diagnostics system. Start here instead: DoneTrace / Fusion Paradigm.
+> Status: experimental module. This repo is one mechanism inside my broader AI Workflow Diagnostics system. Start here instead: [DoneTrace](https://github.com/aaronyi97/ai-collab-open-system) / [Fusion Paradigm](https://github.com/aaronyi97/fusion-paradigm).
 
 # Sparring
 
