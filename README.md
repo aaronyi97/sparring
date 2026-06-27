@@ -1,3 +1,5 @@
+> Status: experimental module. This repo is one mechanism inside my broader AI Workflow Diagnostics system. Start here instead: DoneTrace / Fusion Paradigm.
+
 # Sparring
 
 [中文说明](README.zh-CN.md)
